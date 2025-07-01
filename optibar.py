@@ -16,6 +16,7 @@ test = [
 ]
 
 bars = [
+    ["Metro Flon", "46.5202985", "6.6302880"],
     ["A la Bossette", "46.5260001", "6.6367336"],
     ["L'A-T-E-L-I-E-R", "46.5268293", "6.6198081"],
     ["Bamee Bar", "46.5172634", "6.6324666"],
@@ -70,25 +71,25 @@ def create_data_model(arr):
     data["depot"] = 0
     return data
 
-def print_solution(manager, routing, solution):
+def print_solution(arr, manager, routing, solution):
     """Prints solution on console."""
-    print(f"Objective: {solution.ObjectiveValue()} miles")
+    print(f"Objective: {solution.ObjectiveValue()} metres")
     index = routing.Start(0)
     plan_output = "Route for vehicle 0:\n"
     route_distance = 0
     while not routing.IsEnd(index):
-        plan_output += f" {manager.IndexToNode(index)} ->"
+        plan_output += f" {arr[manager.IndexToNode(index)][0]} ->"
         previous_index = index
         index = solution.Value(routing.NextVar(index))
         route_distance += routing.GetArcCostForVehicle(previous_index, index, 0)
     plan_output += f" {manager.IndexToNode(index)}\n"
-    plan_output += f"Route distance: {route_distance}metres\n"
+    plan_output += f"Route distance: {float(route_distance)/1000}km\n"
     print(plan_output)
 
 def main():
     print("starting")
     # Init data
-    data = create_data_model(test)
+    data = create_data_model(bars)
 
     # Routing index manager
     manager = pywrapcp.RoutingIndexManager(
@@ -121,7 +122,7 @@ def main():
 
     # Print solution on console.
     if solution:
-        print_solution(manager, routing, solution)
+        print_solution(bars, manager, routing, solution)
 
 
 if __name__ == "__main__":
